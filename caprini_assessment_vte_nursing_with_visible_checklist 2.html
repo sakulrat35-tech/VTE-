@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caprini Assessment + VTE Nursing</title>
+<style>
+:root{--navy:#183b56;--blue:#246b8e;--pale:#eef6fa;--gold:#e7b85c;--ink:#243746;--muted:#647786;--line:#d9e3e9;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:#f4f7f9;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.5}
+header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:24px 18px}
+.wrap{max-width:980px;margin:auto;padding:18px}
+h1{font-size:clamp(23px,4vw,32px);margin:0 0 5px}header p{margin:0;color:#e6f1f6}
+.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:18px;margin:0 0 16px;box-shadow:0 4px 14px #173b560a}
+h2{font-size:19px;color:var(--navy);margin:0 0 13px}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+label.field{display:block;font-size:14px;color:var(--muted)}input[type=text],input[type=date],textarea{width:100%;padding:10px 11px;margin-top:5px;border:1px solid #cbd8e0;border-radius:9px;font:inherit;color:var(--ink);background:white}
+.group{border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden}.group h3{margin:0;background:var(--pale);padding:11px 13px;color:var(--navy);font-size:16px}
+.items{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:0 14px;padding:8px 13px}
+.item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid #edf1f4;font-size:14px;cursor:pointer}
+.item input{margin-top:3px;accent-color:var(--blue);width:24px;height:24px;flex-shrink:0;cursor:pointer}.item{cursor:pointer;min-height:52px;align-items:center}.item span:first-of-type{flex:1}.pts{display:inline-block;background:#eaf3f8;border:1px solid #c9e0eb;border-radius:7px;padding:4px 9px;font-size:14px;font-weight:800;color:var(--blue);white-space:nowrap}.item span{flex:1}.pts{font-weight:700;color:var(--blue);white-space:nowrap}
+.sticky{position:sticky;bottom:0;background:#ffffffef;backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;box-shadow:0 -4px 18px #183b5610}
+.scorelabel{font-size:13px;color:var(--muted)}.score{font-size:32px;line-height:1.1;font-weight:800;color:var(--navy)}.risk{font-size:13px;font-weight:800;padding:6px 10px;border-radius:9px;display:inline-block;margin-top:4px}
+.risk-green{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.risk-yellow{background:#fef9c3;color:#854d0e;border:1px solid #fde047}
+.risk-orange{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}
+.risk-red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.item.selected{background:#f0f9ff;border-radius:8px;padding-left:6px;padding-right:6px}
+.save-status{font-size:13px;margin-top:8px;padding:8px 10px;border-radius:8px;display:none}
+.save-status.ok{display:block;background:#dcfce7;color:#166534}
+.save-status.err{display:block;background:#fee2e2;color:#991b1b}
+button{border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eaf1f5;color:var(--navy)}.danger{background:#fff0ef;color:#a22b2b}.buttons{display:flex;gap:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}th{color:var(--navy);background:var(--pale)}
+.history-row button{padding:6px 9px;font-size:12px;margin:2px}.empty{color:var(--muted);font-size:14px;padding:10px 0}
+.note{font-size:13px;color:var(--muted)}.warning{background:#fff8e8;border:1px solid #f0d99e;border-radius:10px;padding:12px;font-size:13px}
+@media(max-width:600px){.wrap{padding:12px}.panel{padding:13px}.items{grid-template-columns:1fr}.sticky{align-items:flex-start}.score{font-size:28px}table{display:block;overflow-x:auto;white-space:nowrap}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>แบบประเมิน Caprini + การพยาบาล VTE</h1>
+<p>แบบประเมินปัจจัยเสี่ยงต่อการเกิดภาวะหลอดเลือดดำอุดตัน (VTE: DVT/PE)</p>
+</div></header>
+<main class="wrap">
+<section class="panel">
+<h2>ข้อมูลผู้ป่วยและการประเมิน</h2>
+<div class="fields">
+<label class="field">รหัสผู้ป่วย / HN<input id="hn" type="text" placeholder="ใช้รหัสผู้ป่วยตามนโยบายหน่วยงาน"></label>
+<label class="field">ชื่อ-สกุลผู้ป่วย (ถ้าจำเป็น)<input id="patientName" type="text" placeholder="กรอกเท่าที่จำเป็นและได้รับอนุญาต"></label>
+<label class="field">อายุ<input id="patientAge" type="text" inputmode="numeric" placeholder="อายุ (ปี)"></label>
+<label class="field">การวินิจฉัย / ชนิดการบาดเจ็บ<input id="diagnosis" type="text" placeholder="เช่น fracture / post-op"></label>
+<label class="field">หอผู้ป่วย / หน่วยงาน<input id="ward" type="text" placeholder="ระบุหอผู้ป่วย"></label>
+<label class="field">เตียง<input id="bed" type="text" placeholder="หมายเลขเตียง"></label>
+<label class="field">วันที่ประเมิน<input id="date" type="date"></label>
+<label class="field">ผู้ประเมิน<input id="assessor" type="text" placeholder="ชื่อหรือรหัสผู้ประเมิน"></label>
+</div>
+<p class="note">เลือกทุกปัจจัยที่ตรงกับผู้ป่วย คะแนนรวมจะคำนวณให้อัตโนมัติ</p>
+</section>
+<section class="panel"><h2>แบบประเมิน Caprini ฉบับที่ส่งมา</h2><p class="note">คงรายการปัจจัยเสี่ยงและคะแนนจากแบบประเมินที่แนบมา พร้อมคำนวณคะแนนรวมอัตโนมัติ</p><h2>รายการปัจจัยเสี่ยง (มีช่องติ๊กทุกข้อ)</h2><p class="note">ติ๊กช่องหน้าปัจจัยเสี่ยงแต่ละข้อที่ตรงกับผู้ป่วย แต่ละข้อแสดงคะแนนกำกับด้านขวา คะแนนรวมจะเปลี่ยนอัตโนมัติทันที</p><div class="note">เลือกได้หลายข้อในแบบประเมินเดียวกัน</div></section><div id="checklist">
+<section class="group"><h3>1 คะแนนต่อปัจจัย</h3><div class="items">
+<label class="item" for="g0i0"><input type="checkbox" id="g0i0" data-points="1" data-label="อายุ 41–60 ปี"><span>อายุ 41–60 ปี</span><span class="pts">+1</span></label>
+<label class="item" for="g0i1"><input type="checkbox" id="g0i1" data-points="1" data-label="เข้ารับการผ่าตัดเล็ก"><span>เข้ารับการผ่าตัดเล็ก</span><span class="pts">+1</span></label>
+<label class="item" for="g0i2"><input type="checkbox" id="g0i2" data-points="1" data-label="ดัชนีมวลกาย (BMI) &gt;25 กก./ม²"><span>ดัชนีมวลกาย (BMI) &gt;25 กก./ม²</span><span class="pts">+1</span></label>
+<label class="item" for="g0i3"><input type="checkbox" id="g0i3" data-points="1" data-label="ขาบวม"><span>ขาบวม</span><span class="pts">+1</span></label>
+<label class="item" for="g0i4"><input type="checkbox" id="g0i4" data-points="1" data-label="เส้นเลือดขอด"><span>เส้นเลือดขอด</span><span class="pts">+1</span></label>
+<label class="item" for="g0i5"><input type="checkbox" id="g0i5" data-points="1" data-label="หญิงตั้งครรภ์หรือหญิงหลังคลอด"><span>หญิงตั้งครรภ์หรือหญิงหลังคลอด</span><span class="pts">+1</span></label>
+<label class="item" for="g0i6"><input type="checkbox" id="g0i6" data-points="1" data-label="มีประวัติแท้งไม่ทราบสาเหตุหรือแท้งซ้ำ"><span>มีประวัติแท้งไม่ทราบสาเหตุหรือแท้งซ้ำ</span><span class="pts">+1</span></label>
+<label class="item" for="g0i7"><input type="checkbox" id="g0i7" data-points="1" data-label="ใช้ยาคุมกำเนิดชนิดรับประทานหรือได้รับฮอร์โมนเสริม"><span>ใช้ยาคุมกำเนิดชนิดรับประทานหรือได้รับฮอร์โมนเสริม</span><span class="pts">+1</span></label>
+<label class="item" for="g0i8"><input type="checkbox" id="g0i8" data-points="1" data-label="ภาวะติดเชื้อ (sepsis) ในช่วง 1 เดือนที่ผ่านมา"><span>ภาวะติดเชื้อ (sepsis) ในช่วง 1 เดือนที่ผ่านมา</span><span class="pts">+1</span></label>
+<label class="item" for="g0i9"><input type="checkbox" id="g0i9" data-points="1" data-label="โรคปอดรุนแรง เช่น ปอดติดเชื้อในช่วง 1 เดือนที่ผ่านมา"><span>โรคปอดรุนแรง เช่น ปอดติดเชื้อในช่วง 1 เดือนที่ผ่านมา</span><span class="pts">+1</span></label>
+<label class="item" for="g0i10"><input type="checkbox" id="g0i10" data-points="1" data-label="การทำงานของปอดผิดปกติ"><span>การทำงานของปอดผิดปกติ</span><span class="pts">+1</span></label>
+<label class="item" for="g0i11"><input type="checkbox" id="g0i11" data-points="1" data-label="โรคหัวใจขาดเลือดเฉียบพลัน (acute MI)"><span>โรคหัวใจขาดเลือดเฉียบพลัน (acute MI)</span><span class="pts">+1</span></label>
+<label class="item" for="g0i12"><input type="checkbox" id="g0i12" data-points="1" data-label="ภาวะหัวใจวาย (congestive heart failure) ในช่วง 1 เดือนที่ผ่านมา"><span>ภาวะหัวใจวาย (congestive heart failure) ในช่วง 1 เดือนที่ผ่านมา</span><span class="pts">+1</span></label>
+<label class="item" for="g0i13"><input type="checkbox" id="g0i13" data-points="1" data-label="การอักเสบของทางเดินอาหาร (inflammatory bowel disease)"><span>การอักเสบของทางเดินอาหาร (inflammatory bowel disease)</span><span class="pts">+1</span></label>
+<label class="item" for="g0i14"><input type="checkbox" id="g0i14" data-points="1" data-label="ผู้ป่วยที่ต้องนอนพักบนเตียง (bed rest)"><span>ผู้ป่วยที่ต้องนอนพักบนเตียง (bed rest)</span><span class="pts">+1</span></label>
+</div></section>
+<section class="group"><h3>2 คะแนนต่อปัจจัย</h3><div class="items">
+<label class="item" for="g1i0"><input type="checkbox" id="g1i0" data-points="2" data-label="อายุ 61–74 ปี"><span>อายุ 61–74 ปี</span><span class="pts">+2</span></label>
+<label class="item" for="g1i1"><input type="checkbox" id="g1i1" data-points="2" data-label="เข้ารับการผ่าตัดข้อด้วยกล้อง (arthroscopic surgery)"><span>เข้ารับการผ่าตัดข้อด้วยกล้อง (arthroscopic surgery)</span><span class="pts">+2</span></label>
+<label class="item" for="g1i2"><input type="checkbox" id="g1i2" data-points="2" data-label="เข้ารับการผ่าตัดใหญ่ ใช้เวลาผ่าตัดมากกว่า 45 นาที"><span>เข้ารับการผ่าตัดใหญ่ ใช้เวลาผ่าตัดมากกว่า 45 นาที</span><span class="pts">+2</span></label>
+<label class="item" for="g1i3"><input type="checkbox" id="g1i3" data-points="2" data-label="เข้ารับการผ่าตัดส่องกล้อง ใช้เวลาผ่าตัดมากกว่า 45 นาที"><span>เข้ารับการผ่าตัดส่องกล้อง ใช้เวลาผ่าตัดมากกว่า 45 นาที</span><span class="pts">+2</span></label>
+<label class="item" for="g1i4"><input type="checkbox" id="g1i4" data-points="2" data-label="ผู้ป่วยมะเร็ง"><span>ผู้ป่วยมะเร็ง</span><span class="pts">+2</span></label>
+<label class="item" for="g1i5"><input type="checkbox" id="g1i5" data-points="2" data-label="นอนติดเตียงมากกว่า 72 ชั่วโมง"><span>นอนติดเตียงมากกว่า 72 ชั่วโมง</span><span class="pts">+2</span></label>
+<label class="item" for="g1i6"><input type="checkbox" id="g1i6" data-points="2" data-label="ผู้ป่วยที่เข้าเฝือก"><span>ผู้ป่วยที่เข้าเฝือก</span><span class="pts">+2</span></label>
+<label class="item" for="g1i7"><input type="checkbox" id="g1i7" data-points="2" data-label="ผู้ป่วยที่มีสายสวนหลอดเลือดดำส่วนกลาง (central venous access)"><span>ผู้ป่วยที่มีสายสวนหลอดเลือดดำส่วนกลาง (central venous access)</span><span class="pts">+2</span></label>
+</div></section>
+<section class="group"><h3>3 คะแนนต่อปัจจัย</h3><div class="items">
+<label class="item" for="g2i0"><input type="checkbox" id="g2i0" data-points="3" data-label="อายุ 75 ปีขึ้นไป"><span>อายุ 75 ปีขึ้นไป</span><span class="pts">+3</span></label>
+<label class="item" for="g2i1"><input type="checkbox" id="g2i1" data-points="3" data-label="เคยมีประวัติเป็น VTE"><span>เคยมีประวัติเป็น VTE</span><span class="pts">+3</span></label>
+<label class="item" for="g2i2"><input type="checkbox" id="g2i2" data-points="3" data-label="เคยมีประวัติครอบครัวเป็น VTE"><span>เคยมีประวัติครอบครัวเป็น VTE</span><span class="pts">+3</span></label>
+<label class="item" for="g2i3"><input type="checkbox" id="g2i3" data-points="3" data-label="ตรวจพบ Factor V Leiden"><span>ตรวจพบ Factor V Leiden</span><span class="pts">+3</span></label>
+<label class="item" for="g2i4"><input type="checkbox" id="g2i4" data-points="3" data-label="ตรวจพบ prothrombin 20210A"><span>ตรวจพบ prothrombin 20210A</span><span class="pts">+3</span></label>
+<label class="item" for="g2i5"><input type="checkbox" id="g2i5" data-points="3" data-label="ตรวจพบ lupus anticoagulant"><span>ตรวจพบ lupus anticoagulant</span><span class="pts">+3</span></label>
+<label class="item" for="g2i6"><input type="checkbox" id="g2i6" data-points="3" data-label="ตรวจพบ anticardiolipin antibodies"><span>ตรวจพบ anticardiolipin antibodies</span><span class="pts">+3</span></label>
+<label class="item" for="g2i7"><input type="checkbox" id="g2i7" data-points="3" data-label="ตรวจพบ homocysteine เพิ่มขึ้น"><span>ตรวจพบ homocysteine เพิ่มขึ้น</span><span class="pts">+3</span></label>
+<label class="item" for="g2i8"><input type="checkbox" id="g2i8" data-points="3" data-label="มีภาวะ heparin-induced thrombocytopenia (HIT)"><span>มีภาวะ heparin-induced thrombocytopenia (HIT)</span><span class="pts">+3</span></label>
+<label class="item" for="g2i9"><input type="checkbox" id="g2i9" data-points="3" data-label="ภาวะเลือดแข็งตัวผิดปกติ (thrombophilia)"><span>ภาวะเลือดแข็งตัวผิดปกติ (thrombophilia)</span><span class="pts">+3</span></label>
+</div></section>
+<section class="group"><h3>5 คะแนนต่อปัจจัย</h3><div class="items">
+<label class="item" for="g3i0"><input type="checkbox" id="g3i0" data-points="5" data-label="โรคหลอดเลือดสมอง (stroke) ในช่วง 1 เดือนที่ผ่านมา"><span>โรคหลอดเลือดสมอง (stroke) ในช่วง 1 เดือนที่ผ่านมา</span><span class="pts">+5</span></label>
+<label class="item" for="g3i1"><input type="checkbox" id="g3i1" data-points="5" data-label="การผ่าตัดใหญ่ข้อบริเวณขาแบบเลือกเวลา (elective major lower-extremity arthroplasty)"><span>การผ่าตัดใหญ่ข้อบริเวณขาแบบเลือกเวลา (elective major lower-extremity arthroplasty)</span><span class="pts">+5</span></label>
+<label class="item" for="g3i2"><input type="checkbox" id="g3i2" data-points="5" data-label="กระดูกสะโพก เชิงกราน หรือขาหัก"><span>กระดูกสะโพก เชิงกราน หรือขาหัก</span><span class="pts">+5</span></label>
+<label class="item" for="g3i3"><input type="checkbox" id="g3i3" data-points="5" data-label="การบาดเจ็บของไขสันหลังเฉียบพลันในช่วง 1 เดือนที่ผ่านมา"><span>การบาดเจ็บของไขสันหลังเฉียบพลันในช่วง 1 เดือนที่ผ่านมา</span><span class="pts">+5</span></label>
+<label class="item" for="g3i4"><input type="checkbox" id="g3i4" data-points="5" data-label="การบาดเจ็บรุนแรงหลายระบบ (multiple trauma)"><span>การบาดเจ็บรุนแรงหลายระบบ (multiple trauma)</span><span class="pts">+5</span></label>
+</div></section>
+</div>
+<section class="panel">
+<h2>บันทึกเพิ่มเติม</h2>
+<textarea id="notes" rows="3" placeholder="บันทึกข้อมูลเพิ่มเติม (ไม่บังคับ)"></textarea>
+</section>
+
+<section class="panel" id="vteNursing">
+<h2>การพยาบาล “ถุงเท้า ขยับไว ห่างไกล VTE”</h2>
+<p class="note">ใช้ร่วมกับแผนการรักษาและแนวทางของโรงพยาบาล การเลือกถุงน่อง/อุปกรณ์ป้องกันต้องเป็นไปตามคำสั่งและการประเมินข้อห้ามของผู้ป่วยแต่ละราย</p>
+<div class="group"><h3>การดูแลถุงน่อง/อุปกรณ์ป้องกัน VTE</h3><div class="items">
+<label class="item"><input type="checkbox" class="vteCheck"><span>ตรวจคำสั่งการใช้และเลือกชนิด/ขนาดให้เหมาะกับผู้ป่วย</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ตรวจผิวหนัง สีผิว อุณหภูมิ อาการชา ปวด บวม และการไหลเวียนเลือดก่อนใส่</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>สวมอุปกรณ์ให้เรียบ ไม่ม้วน ไม่พับ ไม่รัดเป็นขอบกดทับ</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ตรวจผิวหนังและการไหลเวียนเลือดซ้ำตามแนวทางหน่วยงาน/เมื่อมีอาการผิดปกติ</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ถอดตรวจผิวหนังและทำความสะอาดตามแนวทาง โดยไม่ปล่อยให้ผิวหนังอับชื้น</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ประเมินข้อห้าม/ความเหมาะสมก่อนใช้ เช่น โรคหลอดเลือดแดงส่วนปลายรุนแรง แผลหรือผิวหนังเสียหาย หรือสงสัย DVT และปรึกษาผู้รับผิดชอบ</span></label>
+</div></div>
+<div class="group"><h3>กิจกรรมป้องกัน VTE</h3><div class="items">
+<label class="item"><input type="checkbox" class="vteCheck"><span>สอน/ช่วยขยับข้อเท้าขึ้น-ลงและหมุนข้อเท้าตามความเหมาะสม</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ส่งเสริมให้ลุกนั่งหรือเดินเมื่อปลอดภัยและได้รับอนุญาต</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>เปลี่ยนท่าและหลีกเลี่ยงการกดทับ/อยู่นิ่งเป็นเวลานานตามแผนการดูแล</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>กระตุ้นให้ดื่มน้ำตามแผนการรักษาและข้อจำกัดของผู้ป่วย</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ให้ความรู้ผู้ป่วยและญาติเรื่องการขยับตัว การใช้อุปกรณ์ และการแจ้งอาการผิดปกติ</span></label>
+<label class="item"><input type="checkbox" class="vteCheck"><span>ตรวจสอบการได้รับยาป้องกันลิ่มเลือดตามคำสั่งแพทย์ และสังเกตอาการเลือดออก</span></label>
+</div></div>
+<div class="group"><h3>ข้อควรระวังและอาการที่ต้องรีบรายงาน</h3><div class="items">
+<div class="item"><span>หยุด/ประเมินการใช้อุปกรณ์และแจ้งพยาบาลผู้รับผิดชอบ หากมีอาการปวด ชา เย็น ซีด/เขียว ผิวหนังแดงพุพอง หรือรอยกดทับผิดปกติ</span></div>
+<div class="item"><span>รีบรายงานทันทีเมื่อขาบวมข้างเดียว ปวดน่อง ร้อนหรือแดงผิดปกติ ซึ่งอาจเป็นสัญญาณ DVT</span></div>
+<div class="item"><span>หากหอบเหนื่อยเฉียบพลัน เจ็บหน้าอก ไอเป็นเลือด หน้ามืดหรือหมดสติ ให้แจ้งทีมฉุกเฉินทันที ซึ่งอาจเป็นสัญญาณ PE</span></div>
+<div class="item"><span>ห้ามนวดขาที่สงสัย DVT และไม่ฝืนลุกเดิน/ทำกิจกรรมเมื่อมีข้อห้ามหรืออาการไม่คงที่</span></div>
+</div></div>
+<div class="buttons"><button class="secondary" id="checkAllVte">ติ๊กครบทุกข้อ</button><button class="secondary" id="clearVte">ล้างเครื่องหมาย</button></div>
+<p class="note">เช็กลิสต์นี้เป็นเครื่องมือช่วยจำ ไม่แทนการประเมินทางคลินิก ควรปรับให้ตรงกับคำสั่งแพทย์และแนวทางของหน่วยงาน</p>
+</section>
+
+<section class="panel" id="mobilityPanel">
+<h2>แบบบันทึกการขยับข้อเท้าและการพลิกตะแคงตัว</h2>
+<p class="note">บันทึกตามรอบการดูแลของหน่วยงาน (ตัวอย่าง: ทุก 2 ชั่วโมง) ให้ทำเฉพาะเมื่อเหมาะสมกับชนิดการบาดเจ็บ/การผ่าตัดและแผนการรักษา หากมีข้อห้ามให้บันทึกเหตุผลและแจ้งพยาบาลผู้รับผิดชอบ</p>
+<div class="fields">
+<label class="field">วันที่บันทึก<input id="careDate" type="date"></label>
+<label class="field">เวลาที่บันทึก<input id="careTime" type="time"></label>
+<label class="field">ผู้บันทึก<input id="careRecorder" type="text" placeholder="ชื่อหรือรหัสผู้บันทึก"></label>
+</div>
+<div class="group">
+<h3>กิจกรรมการพยาบาล</h3>
+<div class="items">
+<label class="item"><input id="anklePump" type="checkbox"><span>ส่งเสริม/ช่วยขยับข้อเท้าขึ้น-ลง (Ankle pumps) ตามแผนการรักษา</span></label>
+<label class="item"><input id="turnLeft" type="checkbox"><span>พลิกตะแคงซ้าย</span></label>
+<label class="item"><input id="turnRight" type="checkbox"><span>พลิกตะแคงขวา</span></label>
+<label class="item"><input id="turnSupine" type="checkbox"><span>จัดท่านอนหงาย/ปรับท่าและรองรับส่วนที่บาดเจ็บ</span></label>
+<label class="item"><input id="unable" type="checkbox"><span>ยังไม่สามารถทำกิจกรรมได้/มีข้อห้าม</span></label>
+</div>
+</div>
+<div class="fields">
+<label class="field">การตอบสนอง/คะแนนปวดหลังจัดท่า<textarea id="careResponse" rows="2" placeholder="เช่น ปวดก่อน-หลัง, ทนต่อกิจกรรมได้หรือไม่"></textarea></label>
+<label class="field">เหตุผลที่ไม่ได้ทำ/ข้อควรระวัง<textarea id="careReason" rows="2" placeholder="ระบุเหตุผลเมื่อไม่ได้ทำ หรือข้อจำกัดตามแผนการรักษา"></textarea></label>
+</div>
+<div class="buttons" style="margin-top:12px">
+<button class="primary" id="saveCare">บันทึกกิจกรรม</button>
+<button class="secondary" id="clearCare">ล้างแบบฟอร์มกิจกรรม</button>
+</div>
+<div id="careStatus" class="save-status" role="status"></div>
+<h3 style="margin-top:18px;color:var(--navy)">ประวัติกิจกรรมของผู้ป่วยรายนี้</h3>
+<div class="buttons" style="margin:10px 0"><button class="secondary" id="exportCare">ส่งออกบันทึกกิจกรรม CSV</button></div>
+<div id="careHistory"></div>
+</section>
+<div class="sticky">
+<div><div class="scorelabel">คะแนนรวม</div><div class="score"><span id="total">0</span> <span style="font-size:15px;font-weight:600">คะแนน</span></div><div class="risk" id="risk">ยังไม่เลือกปัจจัยเสี่ยง</div><div id="selectedCount" class="note">เลือกแล้ว 0 ข้อ</div></div>
+<div><div class="buttons"><button class="secondary" id="clear">ล้างตัวเลือก</button><button class="primary" id="save">บันทึกการประเมิน</button></div><div id="saveStatus" class="save-status" role="status"></div></div>
+</div>
+<section class="panel" style="margin-top:16px">
+<h2>ประวัติการประเมินที่บันทึกไว้ในอุปกรณ์นี้</h2>
+<p class="note">ประวัติในไฟล์นี้เก็บในเบราว์เซอร์ของอุปกรณ์นี้เท่านั้น ไม่ซิงก์ข้ามเครื่อง หากเปิดเป็นตัวอย่างจากแอป Files แล้วบันทึกไม่ได้ ให้เปิดผ่านเว็บที่เผยแพร่บน HTTPS หรือใช้โปรเจกต์ฐานข้อมูลออนไลน์แทน</p>
+<div class="buttons" style="margin:10px 0"><button class="secondary" id="export">ส่งออกประวัติเป็น CSV</button><button class="danger" id="deleteAll">ลบประวัติทั้งหมด</button></div>
+<div id="history"></div>
+</section>
+<div class="warning"><strong>การแสดงสี:</strong> สีเขียว = คะแนน 0, สีเหลือง = 1–2, สีส้ม = 3–4, สีแดง = ตั้งแต่ 5 คะแนนขึ้นไป ใช้เพื่อช่วยสังเกตคะแนนเท่านั้น ไม่ใช่การวินิจฉัยหรือข้อบ่งชี้การรักษา ต้องเทียบเกณฑ์ Caprini ฉบับและแนวทางของโรงพยาบาลก่อนใช้จริง<br><br><strong>ข้อควรระวัง:</strong> เครื่องมือนี้เป็นตัวช่วยรวมคะแนนจากรายการในภาพที่ผู้ใช้ให้มา ไม่ใช่การวินิจฉัยหรือคำสั่งรักษา เกณฑ์แบ่งระดับความเสี่ยงและการป้องกัน VTE อาจแตกต่างตามรุ่นของ Caprini score กลุ่มผู้ป่วย และแนวทางของโรงพยาบาล โปรดตรวจสอบกับแนวทางหน่วยงานก่อนใช้ตัดสินใจทางคลินิก</div>
+<p class="note">อ้างอิงสำหรับตรวจทาน: <a href="https://www.mdcalc.com/calc/3970/caprini-score-venous-thromboembolism-2005" target="_blank" rel="noopener">MDCalc – Caprini Score (2005)</a> · <a href="https://www.ahrq.gov/patient-safety/settings/hospital/vtguide/guide4.html" target="_blank" rel="noopener">AHRQ – VTE risk assessment</a></p>
+</main>
+<script>
+const groups = [
+{title:"1 คะแนนต่อปัจจัย",points:1,items:[
+"อายุ 41–60 ปี","เข้ารับการผ่าตัดเล็ก","ดัชนีมวลกาย (BMI) >25 กก./ม²","ขาบวม","เส้นเลือดขอด","หญิงตั้งครรภ์หรือหญิงหลังคลอด","มีประวัติแท้งไม่ทราบสาเหตุหรือแท้งซ้ำ","ใช้ยาคุมกำเนิดชนิดรับประทานหรือได้รับฮอร์โมนเสริม","ภาวะติดเชื้อ (sepsis) ในช่วง 1 เดือนที่ผ่านมา","โรคปอดรุนแรง เช่น ปอดติดเชื้อในช่วง 1 เดือนที่ผ่านมา","การทำงานของปอดผิดปกติ","โรคหัวใจขาดเลือดเฉียบพลัน (acute MI)","ภาวะหัวใจวาย (congestive heart failure) ในช่วง 1 เดือนที่ผ่านมา","การอักเสบของทางเดินอาหาร (inflammatory bowel disease)","ผู้ป่วยที่ต้องนอนพักบนเตียง (bed rest)"
+]},
+{title:"2 คะแนนต่อปัจจัย",points:2,items:[
+"อายุ 61–74 ปี","เข้ารับการผ่าตัดข้อด้วยกล้อง (arthroscopic surgery)","เข้ารับการผ่าตัดใหญ่ ใช้เวลาผ่าตัดมากกว่า 45 นาที","เข้ารับการผ่าตัดส่องกล้อง ใช้เวลาผ่าตัดมากกว่า 45 นาที","ผู้ป่วยมะเร็ง","นอนติดเตียงมากกว่า 72 ชั่วโมง","ผู้ป่วยที่เข้าเฝือก","ผู้ป่วยที่มีสายสวนหลอดเลือดดำส่วนกลาง (central venous access)"
+]},
+{title:"3 คะแนนต่อปัจจัย",points:3,items:[
+"อายุ 75 ปีขึ้นไป","เคยมีประวัติเป็น VTE","เคยมีประวัติครอบครัวเป็น VTE","ตรวจพบ Factor V Leiden","ตรวจพบ prothrombin 20210A","ตรวจพบ lupus anticoagulant","ตรวจพบ anticardiolipin antibodies","ตรวจพบ homocysteine เพิ่มขึ้น","มีภาวะ heparin-induced thrombocytopenia (HIT)","ภาวะเลือดแข็งตัวผิดปกติ (thrombophilia)"
+]},
+{title:"5 คะแนนต่อปัจจัย",points:5,items:[
+"โรคหลอดเลือดสมอง (stroke) ในช่วง 1 เดือนที่ผ่านมา","การผ่าตัดใหญ่ข้อบริเวณขาแบบเลือกเวลา (elective major lower-extremity arthroplasty)","กระดูกสะโพก เชิงกราน หรือขาหัก","การบาดเจ็บของไขสันหลังเฉียบพลันในช่วง 1 เดือนที่ผ่านมา","การบาดเจ็บรุนแรงหลายระบบ (multiple trauma)"
+]}
+];
+document.querySelectorAll('#checklist input[type=checkbox]').forEach(cb=>cb.addEventListener('change',updateScore));
+const $=id=>document.getElementById(id);
+function selected(){return [...document.querySelectorAll('#checklist input:checked')].map(x=>({label:x.dataset.label,points:Number(x.dataset.points)}))}
+function score(){return selected().reduce((s,x)=>s+x.points,0)}
+function riskInfo(n){
+ if(n===0)return {text:'สีเขียว · ยังไม่พบปัจจัยที่เลือก',cls:'risk-green'};
+ if(n<=2)return {text:'สีเหลือง · คะแนน 1–2',cls:'risk-yellow'};
+ if(n<=4)return {text:'สีส้ม · คะแนน 3–4',cls:'risk-orange'};
+ return {text:'สีแดง · คะแนนตั้งแต่ 5 ขึ้นไป ควรทบทวนความเสี่ยง',cls:'risk-red'};
+}
+function updateScore(){
+ const n=score();$('total').textContent=n;
+ const r=$('risk'),info=riskInfo(n);r.textContent=info.text;r.className='risk '+info.cls;
+ const count=selected().length;if($('selectedCount'))$('selectedCount').textContent=`เลือกแล้ว ${count} ข้อ`;
+ document.querySelectorAll('#checklist .item').forEach(lab=>{const cb=lab.querySelector('input');lab.classList.toggle('selected',cb.checked)});
+}
+function getHistory(){try{return JSON.parse(localStorage.getItem('capriniHistoryV1')||'[]')}catch(e){return []}}
+function setHistory(a){localStorage.setItem('capriniHistoryV1',JSON.stringify(a))}
+function formData(){return {id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),hn:$('hn').value.trim(),patientName:$('patientName').value.trim(),patientAge:$('patientAge').value.trim(),diagnosis:$('diagnosis').value.trim(),bed:$('bed').value.trim(),ward:$('ward').value.trim(),date:$('date').value||new Date().toISOString().slice(0,10),assessor:$('assessor').value.trim(),notes:$('notes').value.trim(),score:score(),factors:selected(),savedAt:new Date().toLocaleString('th-TH')}}
+function renderHistory(){
+ const a=getHistory().sort((x,y)=>y.id.localeCompare(x.id));const root=$('history');root.innerHTML='';
+ if(!a.length){root.innerHTML='<div class="empty">ยังไม่มีประวัติการประเมิน</div>';return}
+ const table=document.createElement('table');table.innerHTML='<thead><tr><th>วันที่</th><th>HN/รหัส</th><th>คะแนน</th><th>ผู้ประเมิน</th><th>จัดการ</th></tr></thead>';
+ const body=document.createElement('tbody');
+ a.forEach(r=>{const tr=document.createElement('tr');tr.className='history-row';
+  const values=[r.date,r.hn||'-',r.score,r.assessor||'-'];values.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
+  const td=document.createElement('td');const view=document.createElement('button');view.className='secondary';view.textContent='เปิดดู';view.onclick=()=>loadRecord(r.id);
+  const del=document.createElement('button');del.className='danger';del.textContent='ลบ';del.onclick=()=>{if(confirm('ลบรายการนี้ใช่หรือไม่?')){setHistory(getHistory().filter(x=>x.id!==r.id));renderHistory()}};
+  td.append(view,del);tr.appendChild(td);body.appendChild(tr);
+ });table.appendChild(body);root.appendChild(table);
+}
+function loadRecord(id){const r=getHistory().find(x=>x.id===id);if(!r)return;
+ $('hn').value=r.hn||'';$('patientName').value=r.patientName||'';$('patientAge').value=r.patientAge||'';$('diagnosis').value=r.diagnosis||'';$('bed').value=r.bed||'';$('ward').value=r.ward||'';$('date').value=r.date||'';$('assessor').value=r.assessor||'';$('notes').value=r.notes||'';
+ document.querySelectorAll('#checklist input').forEach(x=>x.checked=r.factors.some(f=>f.label===x.dataset.label));updateScore();window.scrollTo({top:0,behavior:'smooth'});
+}
+$('save').onclick=()=>{
+ const status=$('saveStatus');status.className='save-status';status.textContent='';
+ const r=formData();
+ try{
+  const a=getHistory();a.push(r);setHistory(a);
+  const verify=getHistory();
+  if(!verify.some(x=>x.id===r.id))throw new Error('ไม่พบข้อมูลหลังบันทึก');
+  renderHistory();status.className='save-status ok';
+  status.textContent=`บันทึกสำเร็จ · คะแนน ${r.score} · เลือก ${r.factors.length} ข้อ · ประวัตินี้เก็บในอุปกรณ์/เบราว์เซอร์นี้`;
+ }catch(e){
+  status.className='save-status err';
+  status.textContent='บันทึกไม่สำเร็จในเบราว์เซอร์นี้ หากเปิดไฟล์ผ่านแอป Files/หน้าพรีวิว ให้ดาวน์โหลดแล้วเปิดผ่าน Safari หรือเผยแพร่เว็บไซต์ผ่าน HTTPS ก่อนใช้งาน หากต้องการดูประวัติจากหลายเครื่อง ต้องเชื่อมฐานข้อมูลออนไลน์';
+ }
+}
+$('clear').onclick=()=>{if(confirm('ล้างข้อมูลและตัวเลือกที่กรอกอยู่หรือไม่?')){['hn','ward','assessor','notes'].forEach(id=>$(id).value='');$('date').value=new Date().toISOString().slice(0,10);document.querySelectorAll('#checklist input').forEach(x=>x.checked=false);updateScore()}}
+$('deleteAll').onclick=()=>{if(confirm('ยืนยันลบประวัติทั้งหมดจากเบราว์เซอร์นี้?')){setHistory([]);renderHistory()}}
+$('export').onclick=()=>{const a=getHistory();if(!a.length){alert('ยังไม่มีประวัติให้ส่งออก');return}
+ const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const rows=[['วันที่','HN/รหัส','ชื่อผู้ป่วย','อายุ','การวินิจฉัย','เตียง','หอผู้ป่วย','ผู้ประเมิน','คะแนนรวม','ปัจจัยเสี่ยง','บันทึกเพิ่มเติม','เวลาที่บันทึก'],...a.map(r=>[r.date,r.hn,r.patientName,r.patientAge,r.diagnosis,r.bed,r.ward,r.assessor,r.score,r.factors.map(f=>`${f.label} (${f.points})`).join('; '),r.notes,r.savedAt])];
+ const csv='\ufeff'+rows.map(row=>row.map(esc).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='Caprini_Score_History.csv';link.click();URL.revokeObjectURL(url);
+}
+
+function getCareHistory(){try{return JSON.parse(localStorage.getItem('capriniCareHistoryV1')||'[]')}catch(e){return []}}
+function setCareHistory(a){localStorage.setItem('capriniCareHistoryV1',JSON.stringify(a))}
+function careData(){return {id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),hn:$('hn').value.trim(),patientName:$('patientName').value.trim(),date:$('careDate').value||new Date().toISOString().slice(0,10),time:$('careTime').value||'',recorder:$('careRecorder').value.trim(),anklePump:$('anklePump').checked,turnLeft:$('turnLeft').checked,turnRight:$('turnRight').checked,turnSupine:$('turnSupine').checked,unable:$('unable').checked,response:$('careResponse').value.trim(),reason:$('careReason').value.trim(),savedAt:new Date().toLocaleString('th-TH')}}
+function renderCareHistory(){
+ const a=getCareHistory().sort((x,y)=>(y.date+y.time).localeCompare(x.date+x.time));const root=$('careHistory');root.innerHTML='';
+ if(!a.length){root.innerHTML='<div class="empty">ยังไม่มีบันทึกกิจกรรม</div>';return}
+ const table=document.createElement('table');table.innerHTML='<thead><tr><th>วันที่/เวลา</th><th>HN/รหัส</th><th>กิจกรรม</th><th>ผู้บันทึก</th><th>จัดการ</th></tr></thead>';
+ const body=document.createElement('tbody');
+ a.forEach(r=>{const tr=document.createElement('tr');const acts=[r.anklePump?'ขยับข้อเท้า':'',r.turnLeft?'ตะแคงซ้าย':'',r.turnRight?'ตะแคงขวา':'',r.turnSupine?'นอนหงาย/ปรับท่า':'',r.unable?'ทำไม่ได้/มีข้อห้าม':''].filter(Boolean).join(', ')||'-';
+ [r.date+' '+(r.time||''),r.hn||'-',acts,r.recorder||'-'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
+ const td=document.createElement('td');const del=document.createElement('button');del.className='danger';del.textContent='ลบ';del.onclick=()=>{if(confirm('ลบบันทึกกิจกรรมนี้หรือไม่?')){setCareHistory(getCareHistory().filter(x=>x.id!==r.id));renderCareHistory()}};td.appendChild(del);tr.appendChild(td);body.appendChild(tr)});
+ table.appendChild(body);root.appendChild(table)
+}
+$('saveCare').onclick=()=>{const status=$('careStatus');try{const r=careData();const a=getCareHistory();a.push(r);setCareHistory(a);renderCareHistory();status.className='save-status ok';status.textContent='บันทึกกิจกรรมแล้วในเบราว์เซอร์/อุปกรณ์นี้';}catch(e){status.className='save-status err';status.textContent='บันทึกไม่สำเร็จ กรุณาเปิดไฟล์ผ่านเว็บเบราว์เซอร์ที่รองรับ';}};
+$('clearCare').onclick=()=>{['careTime','careRecorder','careResponse','careReason'].forEach(id=>$(id).value='');['anklePump','turnLeft','turnRight','turnSupine','unable'].forEach(id=>$(id).checked=false);$('careStatus').className='save-status';$('careStatus').textContent='';};
+$('exportCare').onclick=()=>{const a=getCareHistory();if(!a.length){alert('ยังไม่มีบันทึกกิจกรรมให้ส่งออก');return}const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[['วันที่','เวลา','HN/รหัส','ชื่อผู้ป่วย','ขยับข้อเท้า','ตะแคงซ้าย','ตะแคงขวา','นอนหงาย/ปรับท่า','ทำไม่ได้/มีข้อห้าม','การตอบสนอง/คะแนนปวด','เหตุผล/ข้อควรระวัง','ผู้บันทึก','เวลาที่บันทึก'],...a.map(r=>[r.date,r.time,r.hn,r.patientName,r.anklePump?'ใช่':'ไม่',r.turnLeft?'ใช่':'ไม่',r.turnRight?'ใช่':'ไม่',r.turnSupine?'ใช่':'ไม่',r.unable?'ใช่':'ไม่',r.response,r.reason,r.recorder,r.savedAt])];const blob=new Blob(['\\ufeff'+rows.map(row=>row.map(esc).join(',')).join('\\r\\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='VTE_Mobility_Care_History.csv';link.click();URL.revokeObjectURL(url)};
+$('checkAllVte').onclick=()=>document.querySelectorAll('.vteCheck').forEach(x=>x.checked=true);
+$('clearVte').onclick=()=>document.querySelectorAll('.vteCheck').forEach(x=>x.checked=false);
+$('careDate').value=new Date().toISOString().slice(0,10);
+renderCareHistory();
+
+$('date').value=new Date().toISOString().slice(0,10);updateScore();renderHistory();
+</script>
+</body>
+</html>
